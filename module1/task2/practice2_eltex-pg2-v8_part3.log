@@ -103,4 +103,80 @@ remote: Compressing objects: 100% (9/9), done.
 remote: Total 11 (delta 0), reused 11 (delta 0), pack-reused 0 (from 0)
 Receiving objects: 100% (11/11), 4.31 KiB | 4.31 MiB/s, done.
 root@eltex-practice2-pg2-v8:~/Eltex_clone# cd ../Eltex
+root@eltex-practice2-pg2-v8:~/Eltex# cp ~/practice2_eltex-pg2-v8_part* ./module1/task2/
+root@eltex-practice2-pg2-v8:~/Eltex# ls ./module1/task2
+practice2_eltex-pg2-v8_part1.log  practice2_eltex-pg2-v8_part2.log  practice2_eltex-pg2-v8_part3.log
+root@eltex-practice2-pg2-v8:~/Eltex# git add .
+root@eltex-practice2-pg2-v8:~/Eltex# git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        new file:   module1/task2/practice2_eltex-pg2-v8_part1.log
+        new file:   module1/task2/practice2_eltex-pg2-v8_part2.log
+        new file:   module1/task2/practice2_eltex-pg2-v8_part3.log
+
+root@eltex-practice2-pg2-v8:~/Eltex# git commit -m "Second lab reports"
+[main 31d887c] Second lab reports
+ 3 files changed, 374 insertions(+)
+ create mode 100644 module1/task2/practice2_eltex-pg2-v8_part1.log
+ create mode 100644 module1/task2/practice2_eltex-pg2-v8_part2.log
+ create mode 100644 module1/task2/practice2_eltex-pg2-v8_part3.log
+root@eltex-practice2-pg2-v8:~/Eltex# git push
+Enumerating objects: 9, done.
+Counting objects: 100% (9/9), done.
+Delta compression using up to 2 threads
+Compressing objects: 100% (7/7), done.
+Writing objects: 100% (7/7), 6.54 KiB | 6.54 MiB/s, done.
+Total 7 (delta 0), reused 0 (delta 0), pack-reused 0
+To https://github.com/PorterCat/Eltex
+   b95abed..31d887c  main -> main
+root@eltex-practice2-pg2-v8:~/Eltex# cd ~/Eltex_clone/
+root@eltex-practice2-pg2-v8:~/Eltex_clone# git fetch
+remote: Enumerating objects: 9, done.
+remote: Counting objects: 100% (9/9), done.
+remote: Compressing objects: 100% (7/7), done.
+remote: Total 7 (delta 0), reused 7 (delta 0), pack-reused 0 (from 0)
+Unpacking objects: 100% (7/7), 6.52 KiB | 6.52 MiB/s, done.
+From https://github.com/PorterCat/Eltex
+   b95abed..31d887c  main       -> origin/main
+root@eltex-practice2-pg2-v8:~/Eltex_clone# git log origin/main 
+commit 31d887ce4e9f40738fd85973070a01beaf3cf188 (origin/main, origin/HEAD)
+Author: PorterCat <leportercat@gmail.com>
+Date:   Wed Oct 21 10:25:28 2026 +0000
+
+    Second lab reports
+
+commit b95abed8e92bb9500e0218bd1d00a9b0b186c95a (HEAD -> main)
+Author: PorterCat <leportercat@gmail.com>
+Date:   Wed Oct 21 10:11:58 2026 +0000
+
+    First lab reports
+
+commit edd6c4614f34354ed42bc867916983a5e93a6cc5
+Author: PorterCat <leportercat@gmail.com>
+Date:   Wed Oct 21 09:28:52 2026 +0000
+
+    first commit
+root@eltex-practice2-pg2-v8:~/Eltex_clone# git diff main origin/main
+diff --git a/module1/task2/practice2_eltex-pg2-v8_part1.log b/module1/task2/practice2_eltex-pg2-v8_part1.log
+new file mode 100644
+index 0000000..a233d15
+--- /dev/null
++++ b/module1/task2/practice2_eltex-pg2-v8_part1.log
+@@ -0,0 +1,166 @@
++# на сервере из практики 1
++
++$ ssh-keygen
+root@eltex-practice2-pg2-v8:~/Eltex_clone# git merge origin/main
+Updating b95abed..31d887c
+Fast-forward
+ module1/task2/practice2_eltex-pg2-v8_part1.log | 166 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ module1/task2/practice2_eltex-pg2-v8_part2.log | 102 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ module1/task2/practice2_eltex-pg2-v8_part3.log | 106 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 374 insertions(+)
+ create mode 100644 module1/task2/practice2_eltex-pg2-v8_part1.log
+ create mode 100644 module1/task2/practice2_eltex-pg2-v8_part2.log
+ create mode 100644 module1/task2/practice2_eltex-pg2-v8_part3.log
 
