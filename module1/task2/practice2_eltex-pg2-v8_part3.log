@@ -1,0 +1,106 @@
+# git config --global user.name "PorterCat"
+# git config --global user.email "leportercat@gmail.com"
+# git config --global init.defaultBranch main
+# apt update
+# apt install git gh
+# ssh-keygen -t ed25519 -f ~/.ssh/portercat
+# cat ~/.ssh/portercat.pub >> "$LOG"
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINuzsFtAbHVkrJF2BEUa9IGJjtHOtwX4jSppIabAp+yJ root@eltex-practice2-pg2-v8
+# gh auth login
+# echo "✓ Logged in as PorterCat" >> "$LOG"
+✓ Logged in as PorterCat
+# gh auth setup-git --hostname github.com
+# gh auth status
+# gh auth status >> "$LOG"
+github.com
+  ✓ Logged in to github.com account PorterCat (/root/.config/gh/hosts.yml)
+  - Active account: true
+  - Git operations protocol: ssh
+  - Token: gho_************************************
+  - Token scopes: 'admin:public_key', 'gist', 'read:org', 'repo'
+# gh repo create --public Eltex
+✓ Created repository PorterCat/Eltex on GitHub
+  https://github.com/PorterCat/Eltex
+
+# mkdir ~/Eltex && cd ~/Eltex
+~/Eltex# echo "# Репозиторий для лабораторных работ на курсе Eltex: Системное программирование на Линукс" >> README.md
+~/Eltex# git init
+Initialized empty Git repository in /root/Eltex/.git/
+~/Eltex# git add README.md
+~/Eltex# git commit -m "first commit"
+[main (root-commit) edd6c46] first commit
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README.md
+
+~/Eltex# git branch -M main
+~/Eltex# git remote add origin https://github.com/PorterCat/Eltex
+~/Eltex# git status >> "$LOG"
+On branch main
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	practice2_eltex-pg2-v8_part3.log
+
+nothing added to commit but untracked files present (use "git add" to track)
+~/Eltex# git push -u origin main 
+Enumerating objects: 3, done.
+Counting objects: 100% (3/3), done.
+Delta compression using up to 2 threads
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 334 bytes | 334.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+To https://github.com/PorterCat/Eltex
+ * [new branch]      main -> main
+
+# mkdir -p module1/task1
+# mkdir module1/task2
+# mkdir module1/task3
+
+# exit и на сервере 1 практики авторизуемся с флагом R
+# ssh -R 2222:localhost:22 root@172.16.9.208
+root@eltex-practice2-pg2-v8:~# scp -P 2222 "eltex-pg2-v8@localhost:~/*.txt" /root/Eltex//module1/task1/
+eltex-pg2-v8@localhost's password: 
+report_part1.txt                                                                                                                                                                                          100%  122     7.0KB/s   00:00    
+root@eltex-practice2-pg2-v8:~# scp -P 2222 "eltex-pg2-v8@localhost:~/*.log" /root/Eltex//module1/task1/
+eltex-pg2-v8@localhost's password: 
+eltex-pg2-v8_part2.log                                                                                                                                                                                    100% 5077     3.4MB/s   00:00    
+eltex-pg2-v8_part3.log                                                                                                                                                                                    100% 8047   699.0KB/s   00:00    
+eltex-pg2-v8_part3_gt20M.log                                                                                                                                                                              100% 2878     2.7MB/s   00:00    
+
+root@eltex-practice2-pg2-v8:~/Eltex# git add .
+root@eltex-practice2-pg2-v8:~/Eltex# git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        new file:   module1/task1/eltex-pg2-v8_part2.log
+        new file:   module1/task1/eltex-pg2-v8_part3.log
+        new file:   module1/task1/eltex-pg2-v8_part3_gt20M.log
+        new file:   module1/task1/report_part1.txt
+
+root@eltex-practice2-pg2-v8:~/Eltex# git commit -m "First lab reports"
+[main b95abed] First lab reports
+ 4 files changed, 385 insertions(+)
+ create mode 100644 module1/task1/eltex-pg2-v8_part2.log
+ create mode 100644 module1/task1/eltex-pg2-v8_part3.log
+ create mode 100644 module1/task1/eltex-pg2-v8_part3_gt20M.log
+ create mode 100644 module1/task1/report_part1.txt
+root@eltex-practice2-pg2-v8:~/Eltex# git push
+Enumerating objects: 9, done.
+Counting objects: 100% (9/9), done.
+Delta compression using up to 2 threads
+Compressing objects: 100% (7/7), done.
+Writing objects: 100% (8/8), 4.02 KiB | 4.02 MiB/s, done.
+Total 8 (delta 0), reused 0 (delta 0), pack-reused 0
+To https://github.com/PorterCat/Eltex
+   edd6c46..b95abed  main -> main
+root@eltex-practice2-pg2-v8:~# mkdir ~/Eltex_clone && cd ~/Eltex_clone
+root@eltex-practice2-pg2-v8:~/Eltex_clone# git clone https://github.com/PorterCat/Eltex .
+Cloning into '.'...
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (9/9), done.
+remote: Total 11 (delta 0), reused 11 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (11/11), 4.31 KiB | 4.31 MiB/s, done.
+root@eltex-practice2-pg2-v8:~/Eltex_clone# cd ../Eltex
+

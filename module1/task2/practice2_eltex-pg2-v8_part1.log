@@ -1,0 +1,166 @@
+# на сервере из практики 1
+
+$ ssh-keygen
+$ ssh-copy-id root@172.16.9.208
+$ ssh root@172.16.9.208
+
+$ cat ~/.ssh/*.pub
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCV4mC3rGLFZAsgcZp94effGHClkC4u3d8BWfm9jlUbN6s/QPQYOFm0p7j11GQoCMK8iYzie/NC/HC1OY0r7IlW2Q+PT1Y9/JW6LR9FDYER/s6GSLctj/keo1Q87/Yfqmb2hYh7QS65e
+tnFDICYBgyHGpBLkOu8bBLaZ8rqyXXzog6z/ISCIV4bU+W1d8I/FouIGc/Saqf32O1yKzXhV5pV3wCfqAZMwP7Q4BtCgl2FBU1OyvNC8KnbcJ2ifTfOwHORWn7uAv1JCDD8VF5Jg/v09zIPVXi9MRa2VfpOhVQL9S2s9XpOSg3WGHlIfK
+kaOP+63CHiG+I5MNn4cHlTLmB532qt/7T9782FDlBhzfspHH8JLBpGyUv2FghvfnZPn8QQCd1rMYCU9KR2sMdhGKM7+c++ESqcPWoTva1KUAvxok5bORNeZRktCmxiL65JWbja2CVkA7I5RD82Jpp6v0Uu5N1/uudlMeDJlsOdzVtITRb
+1mLXjaqH0tYQ7AT1QUWc= eltex-pg2-v8@eltex-2026-autumn
+
+# на сервере из практики 2
+
+# cat ~/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCV4mC3rGLFZAsgcZp94effGHClkC4u3d8BWfm9jlUbN6s/QPQYOFm0p7j11GQoCMK8iYzie/NC/HC1OY0r7IlW2Q+PT1Y9/JW6LR9FDYER/s6GSLctj/keo1Q87/Yfqmb2hYh7QS65e
+tnFDICYBgyHGpBLkOu8bBLaZ8rqyXXzog6z/ISCIV4bU+W1d8I/FouIGc/Saqf32O1yKzXhV5pV3wCfqAZMwP7Q4BtCgl2FBU1OyvNC8KnbcJ2ifTfOwHORWn7uAv1JCDD8VF5Jg/v09zIPVXi9MRa2VfpOhVQL9S2s9XpOSg3WGHlIfK
+kaOP+63CHiG+I5MNn4cHlTLmB532qt/7T9782FDlBhzfspHH8JLBpGyUv2FghvfnZPn8QQCd1rMYCU9KR2sMdhGKM7+c++ESqcPWoTva1KUAvxok5bORNeZRktCmxiL65JWbja2CVkA7I5RD82Jpp6v0Uu5N1/uudlMeDJlsOdzVtITRb
+1mLXjaqH0tYQ7AT1QUWc= eltex-pg2-v8@eltex-2026-autumn
+
+# PS0='$(echo "#" $(history 1 | sed "s/^ practice2_eltex-pg2-v8_part1.log *//") >> "$LOG")'
+# useradd -m -s /bin/bash user1
+# passwd user1 2>&1 | tee -a "$LOG"
+New password:
+Retype new password:
+passwd: password updated successfully
+# adduser user2 2>&1 | tee -a "$LOG"
+info: Adding user `user2' ...
+info: Selecting UID/GID from range 1000 to 59999 ...
+info: Adding new group `user2' (1002) ...
+info: Adding new user `user2' (1002) with group `user2 (1002)' ...
+info: Creating home directory `/home/user2' ...
+info: Copying files from `/etc/skel' ...
+New password: 
+Retype new password: 
+passwd: password updated successfully
+Changing the user information for user2
+Enter the new value, or press ENTER for the default
+	Full Name []: 	Room Number []: 	Work Phone []: 	Home Phone []: 	Other []: Is the information correct? [Y/n] info: Adding new user `user2' to supplemental / extra groups `users' ...
+info: Adding user `user2' to group `users' ...
+# adduser user3 2>&1 | tee -a "$LOG"
+info: Adding user `user3' ...
+info: Selecting UID/GID from range 1000 to 59999 ...
+info: Adding new group `user3' (1003) ...
+info: Adding new user `user3' (1003) with group `user3 (1003)' ...
+info: Creating home directory `/home/user3' ...
+info: Copying files from `/etc/skel' ...
+New password: 
+Retype new password: 
+passwd: password updated successfully
+Changing the user information for user3
+Enter the new value, or press ENTER for the default
+	Full Name []: 	Room Number []: 	Work Phone []: 	Home Phone []: 	Other []: Is the information correct? [Y/n] info: Adding new user `user3' to supplemental / extra groups `users' ...
+info: Adding user `user3' to group `users' ...
+
+# usermod -s /usr/sbin/nologin user3 2>&1 | tee -a "$LOG"
+# su user3 2>&1 | tee -a "$LOG"
+This account is currently not available.
+# su -s /bin/bash user3 2>&1 | tee -a "$LOG"
+Hello World
+
+# L() { "$@" 2>&1 | tee -a "$LOG"; }
+# L su user3
+This account is currently not available.
+# L su -s /bin/bash user3
+bash: line 1: logout: not login shell: use `exit'
+# L groupadd mygroup
+# usermod -aG mygroup user1
+# usermod -aG mygroup user2
+# usermod -aG mygroup user3
+# L groups user1 user2 user3
+user1 : user1 mygroup
+user2 : user2 users mygroup
+user3 : user3 users mygroup
+# mkdir /opt/share/
+# L chmod 2770 /opt/share
+# L ls -ld /opt/share
+drwxrws--- 2 root root 4096 Oct 19 11:17 /opt/share
+# chgrp mygroup /opt/share
+# L ls -ld /opt/share
+drwxrws--- 2 root mygroup 4096 Oct 19 11:17 /opt/share
+# echo "umask 007" >> /home/user1/.bashrc
+# su - user1 -c "touch /opt/share/file1"
+# L ls -l /opt/share
+total 0
+-rw-rw---- 1 user1 mygroup 0 Oct 19 12:25 file1
+# su - user2 -c "touch /opt/share/file2"
+# L su - user3 -s /bin/bash -c "touch /opt/share/file3"
+# L ls -l /opt/share/
+total 0
+-rw-rw---- 1 user1 mygroup 0 Oct 19 12:25 file1
+-rw-rw-r-- 1 user2 mygroup 0 Oct 19 12:28 file2
+-rw-rw-r-- 1 user3 mygroup 0 Oct 19 12:32 file3
+# su - user1 -c "rm /opt/share/file2"
+# su - user2 -c "rm /opt/share/file3"
+# su - user3 -s /bin/bash -c "rm /opt/share/file1"
+# ls -l /opt/share/
+# chmod 1770 /opt/share
+# su - user1 -c "touch /opt/share/file1"
+# su - user2 -c "touch /opt/share/file2"
+# L su - user3 -s /bin/bash -c "touch /opt/share/file3"
+# L ls -l /opt/share
+total 0
+-rw-rw---- 1 user1 mygroup 0 Oct 19 12:38 file1
+-rw-rw-r-- 1 user2 mygroup 0 Oct 19 12:38 file2
+-rw-rw-r-- 1 user3 mygroup 0 Oct 19 12:38 file3
+# L su - user1 -c "rm /opt/share/file2"
+rm: cannot remove '/opt/share/file2': Operation not permitted
+# sudo visudo
+# L tail -n 2 /etc/sudoers
+
+user1 ALL=(ALL:ALL) NOPASSWD: /usr/bin/dmesg
+# L su - user1
+$ sudo dmesg | tail -n 3
+[  138.982104] kauditd_printk_skb: 109 callbacks suppressed
+[  138.982108] audit: type=1400 audit(1792344247.669:121): apparmor="STATUS" operation="profile_replace" info="same as current profile, skipping" profile="unconfined" name="/usr/lib/snapd/snap-confine" pid=838 comm="apparmor_parser"
+[62758.194527] systemd-journald[310]: /var/log/journal/560b026a44d3424ea490d29e1a7e2775/user-1003.journal: Journal file uses a different sequence number ID, rotating.
+# vim user2_dmesg.sh
+# L cat user2_dmesg.sh
+# !/bin/bash
+
+/usr/bin/dmesg
+# mv user2_dmesg.sh /opt/share/user2_dmesg.sh
+# chmod 4755 /opt/share/user2_dmesg.sh
+# sudo visudo
+# tail -n 2 /etc/sudoers
+# L su - user2 -c "/opt/share/user2_dmesg.sh | tail -n 3"
+dmesg: read kernel buffer failed: Operation not permitted
+# chage -M 10 user1
+# chage -M 10 user2
+# chage -M 10 user3
+# apt install -y bzip2 p7zip-full
+# echo "Мищук Андрей" > /etc/motd
+# L cat /etc/motd
+Мищук Андрей
+# rsync -a /etc/ /root/etc_backup/
+# tar -czf etc_backup.tar.gz -C /root/etc_backup/ .
+# tar -cjf etc_backup.tar.bz2 -C /root/etc_backup/ .
+# tar -cf etc_backup.tar -C /root/etc_backup/ .
+# 7z a etc_backup.tar.7z etc_backup.tar
+# L ls -lhd ./etc_backup ./etc_backup.tar ./etc_backup.tar.7z ./etc_backup.tar.bz2 ./etc_backup.tar.gz
+drwxr-xr-x 109 root root 4.0K Oct 20 07:57 ./etc_backup
+-rw-r--r--   1 root root 3.3M Oct 20 09:54 ./etc_backup.tar
+-rw-r--r--   1 root root 455K Oct 20 09:58 ./etc_backup.tar.7z
+-rw-r--r--   1 root root 528K Oct 20 09:54 ./etc_backup.tar.bz2
+-rw-r--r--   1 root root 563K Oct 20 09:54 ./etc_backup.tar.gz
+# echo "$(date '+%Y-%m-%d %H:%M:%S')" >> /etc/motd
+# L rsync -avz --delete /etc/ /root/etc_backup/
+sending incremental file list
+motd
+
+sent 66,419 bytes  received 286 bytes  133,410.00 bytes/sec
+total size is 2,332,321  speedup is 34.96
+# tar -czf etc_backup.tar.gz -C /root/etc_backup/ .
+# tar --compare -jf ./etc_backup.tar.bz2 -C /root/etc_backup
+# L tar --compare -jf ./etc_backup.tar.bz2 -C /root/etc_backup
+./motd: Mod time differs
+./motd: Size differs
+# tar -xzf ./etc_backup.tar.gz -C /root/etc_backup_gzip
+# mkdir -p /root/etc_backup_gzip /root/etc_backup_7zip
+# tar -xzf ./etc_backup.tar.gz -C /root/etc_backup_gzip
+# 7z x ./etc_backup.tar.7z -so | tar -xf - -C /root/etc_backup_7zip
+# L diff ./etc_backup_gzip/motd ./etc_backup_7zip/motd
+2d1
+< 2026-10-20 10:12:36
+# echo $PS0
