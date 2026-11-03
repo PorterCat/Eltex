@@ -43,7 +43,7 @@ static const ListInfo lists[] = {{"Phone", FIELD_PHONE_BASE},
 
 static int selected;
 
-static void save(Phonebook *pb)
+static void save(const PhonebookAPI *pb)
 {
     if (storage_save(pb, DATA_FILE) != 0)
     {
@@ -95,7 +95,7 @@ static int make_properties(Property *properties)
     return count;
 }
 
-static int contact_is_complete(Contact *contact)
+static int contact_is_complete(const Contact *contact)
 {
     const char *last_name;
     const char *first_name;
@@ -149,7 +149,7 @@ static int edit_contact(Contact *contact, int editing)
                 attron(A_REVERSE);
                 mvhline(row, 0, ' ', COLS);
             }
-            mvprintw(row, 2, "%-24s %s", properties[i].label, value[0] ? value : "—");
+            mvprintw(row, 2, "%-24s %s", properties[i].label, value[0] ? value : "-");
             if (i == current)
                 attroff(A_REVERSE);
         }
@@ -230,25 +230,29 @@ static int edit_contact(Contact *contact, int editing)
     }
 }
 
-static int show_contact(Contact *contact)
+static int show_contact(const PhonebookAPI *pb, int index)
 {
     Property properties[PROPERTY_COUNT];
     int count = make_properties(properties);
+    Contact contact;
     const char *last_name = "";
     const char *first_name = "";
     const char *middle_name = "";
     int row = 3;
 
+    if (pb->get(pb->context, index, &contact) != 0)
+        return 0;
+
     clear();
-    cont_get_field(contact, FIELD_LAST_NAME, &last_name);
-    cont_get_field(contact, FIELD_FIRST_NAME, &first_name);
-    cont_get_field(contact, FIELD_MIDDLE_NAME, &middle_name);
+    cont_get_field(&contact, FIELD_LAST_NAME, &last_name);
+    cont_get_field(&contact, FIELD_FIRST_NAME, &first_name);
+    cont_get_field(&contact, FIELD_MIDDLE_NAME, &middle_name);
     mvprintw(1, 2, "%s %s %s", last_name, first_name, middle_name);
 
     for (int i = 3; i < count && row < LINES - 2; ++i)
     {
         const char *value = "";
-        if (cont_get_field(contact, properties[i].field, &value) == 0 && value[0])
+        if (cont_get_field(&contact, properties[i].field, &value) == 0 && value[0])
             mvprintw(row++, 2, "%s: %s", properties[i].label, value);
     }
 
@@ -258,31 +262,40 @@ static int show_contact(Contact *contact)
 
     if (getch() == 'e')
     {
-        Contact edited = *contact;
-        if (edit_contact(&edited, 1) && contact_is_complete(&edited))
-        {
-            *contact = edited;
+        Contact edited = contact;
+
+        if (edit_contact(&edited, 1) && contact_is_complete(&edited) &&
+            pb->update(pb->context, index, &edited) == 0)
             return 1;
-        }
     }
+
     return 0;
 }
-
-static void draw_table(Phonebook *pb)
+static void draw_table(const PhonebookAPI *pb)
 {
+    int count = pb->count(pb->context);
+
     clear();
     attron(A_BOLD);
     mvprintw(0, 0, "%-4s %-24s %-24s %-24s", "#", "Last name", "First name", "Phone");
     attroff(A_BOLD);
 
-    for (int i = 0; i < pb->count && i < LINES - 4; ++i)
+    if (count < 0)
+        count = 0;
+
+    for (int i = 0; i < count && i < LINES - 4; ++i)
     {
+        Contact contact;
         const char *last_name = "";
         const char *first_name = "";
         const char *phone = "";
-        cont_get_field(&pb->items[i], FIELD_LAST_NAME, &last_name);
-        cont_get_field(&pb->items[i], FIELD_FIRST_NAME, &first_name);
-        cont_get_field(&pb->items[i], FIELD_PHONE_BASE, &phone);
+
+        if (pb->get(pb->context, i, &contact) != 0)
+            continue;
+
+        cont_get_field(&contact, FIELD_LAST_NAME, &last_name);
+        cont_get_field(&contact, FIELD_FIRST_NAME, &first_name);
+        cont_get_field(&contact, FIELD_PHONE_BASE, &phone);
 
         if (i == selected)
             attron(A_REVERSE);
@@ -296,8 +309,10 @@ static void draw_table(Phonebook *pb)
     refresh();
 }
 
-int ui_run(Phonebook *pb)
+int ui_run(PhonebookAPI *pb)
 {
+    selected = 0;
+
     initscr();
     cbreak();
     noecho();
@@ -307,7 +322,17 @@ int ui_run(Phonebook *pb)
 
     for (;;)
     {
+        int count = pb->count(pb->context);
+
+        if (count < 0)
+            count = 0;
+        if (selected >= count && count > 0)
+            selected = count - 1;
+        if (count == 0)
+            selected = 0;
+
         draw_table(pb);
+
         switch (getch())
         {
         case KEY_UP:
@@ -315,34 +340,41 @@ int ui_run(Phonebook *pb)
                 --selected;
             break;
         case KEY_DOWN:
-            if (selected < pb->count - 1)
+            if (selected < count - 1)
                 ++selected;
             break;
         case 'a':
         {
             Contact contact = {0};
-            if (pb->count >= MAX_CONTACTS)
-                break;
 
             if (edit_contact(&contact, 0) && contact_is_complete(&contact))
             {
-                pb->items[pb->count++] = contact;
-                selected = pb->count - 1;
-                save(pb);
+                if (pb->add(pb->context, &contact) == 0)
+                {
+                    save(pb);
+                }
+                else
+                {
+                    mvaddstr(LINES - 1, 2, "Cannot add contact");
+                    clrtoeol();
+                    refresh();
+                    getch();
+                }
             }
             break;
         }
         case 'd':
-            if (pb->count > 0)
+            if (count > 0)
             {
                 mvprintw(LINES - 1, 0, "Delete contact? (y/n): ");
                 clrtoeol();
                 refresh();
                 int confirm = getch();
-                if (confirm == 'y' || confirm == 'Y')
+
+                if ((confirm == 'y' || confirm == 'Y') && pb->remove(pb->context, selected) == 0)
                 {
-                    pb_remove(pb, selected);
-                    if (selected >= pb->count && selected > 0)
+                    count = pb->count(pb->context);
+                    if (selected >= count && selected > 0)
                         --selected;
                     save(pb);
                 }
@@ -351,8 +383,13 @@ int ui_run(Phonebook *pb)
         case '\n':
         case '\r':
         case KEY_ENTER:
-            if (pb->count > 0 && show_contact(&pb->items[selected]))
-                save(pb);
+            if (count > 0)
+            {
+                if (show_contact(pb, selected))
+                {
+                    save(pb);
+                }
+            }
             break;
         case 'q':
             endwin();

@@ -1,8 +1,8 @@
 #ifndef UI_H
 #define UI_H
 
-#include "phonebook.h"
+#include "phonebook_api.h"
 
-int ui_run(Phonebook *pb);
+int ui_run(PhonebookAPI *pb);
 
 #endif

@@ -2,20 +2,23 @@
 #include "storage.h"
 #include "ui.h"
 
-#include <locale.h>
 #include <stdio.h>
 
-int main(void)
+int main()
 {
-    setlocale(LC_ALL, "");
+    Phonebook contacts = {0};
+    PhonebookAPI api;
 
-    Phonebook pb = {0};
+    if (pb_bind(&api, &contacts) != 0)
+    {
+        return 1;
+    }
 
-    if (storage_load(&pb, "phonebook.dat") != 0)
+    if (storage_load(&api, "phonebook.dat") != 0)
     {
         fprintf(stderr, "Cannot load a phonebook\n");
         return 1;
     }
 
-    return ui_run(&pb);
+    return ui_run(&api);
 }

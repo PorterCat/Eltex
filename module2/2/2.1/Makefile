@@ -7,8 +7,8 @@ OBJ_DIR = obj
 
 TARGET = $(BIN_DIR)/phonebook
 
-SRCS = main.c phonebook.c storage.c ui.c
-DEPS = phonebook.h storage.h ui.h
+SRCS = main.c contact.c phonebook.c storage.c ui.c
+DEPS = contact.h phonebook.h storage.h ui.h
 
 OBJS = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRCS))
 

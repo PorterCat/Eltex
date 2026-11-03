@@ -1,51 +1,75 @@
 #include "storage.h"
 
+#include <errno.h>
 #include <stdio.h>
-#include <string.h>
 
-int storage_load(Phonebook *pb, const char *path)
+static int api_is_valid(const PhonebookAPI *pb)
 {
-    if (!pb || !path)
+    return pb != NULL && pb->context != NULL && pb->count != NULL && pb->get != NULL &&
+           pb->add != NULL && pb->clear != NULL;
+}
+
+int storage_load(const PhonebookAPI *pb, const char *path)
+{
+    if (!api_is_valid(pb) || path == NULL || pb->count(pb->context) != 0)
         return -1;
 
     FILE *file = fopen(path, "rb");
 
-    if (!file)
+    if (file == NULL)
+        return errno == ENOENT ? 0 : -1;
+
+    int count = 0;
+    int result = 0;
+
+    if (fread(&count, sizeof(count), 1, file) != 1 || count < 0)
+        result = -1;
+
+    for (int i = 0; result == 0 && i < count; ++i)
     {
-        memset(pb, 0, sizeof(*pb));
-        return 0;
+        Contact contact;
+
+        if (fread(&contact, sizeof(contact), 1, file) != 1 || pb->add(pb->context, &contact) != 0)
+            result = -1;
     }
 
-    int count;
+    if (fclose(file) != 0)
+        result = -1;
 
-    if (fread(&count, sizeof(count), 1, file) != 1 || count < 0 || count > MAX_CONTACTS ||
-        fread(pb->items, sizeof(Contact), count, file) != (size_t)count)
-    {
-        fclose(file);
-        memset(pb, 0, sizeof(*pb));
-        return -1;
-    }
+    if (result != 0)
+        pb->clear(pb->context);
 
-    pb->count = count;
-    fclose(file);
-    return 0;
+    return result;
 }
 
-int storage_save(const Phonebook *pb, const char *path)
+int storage_save(const PhonebookAPI *pb, const char *path)
 {
-    if (!pb || !path || pb->count < 0 || pb->count > MAX_CONTACTS)
+    if (!api_is_valid(pb) || path == NULL)
+        return -1;
+
+    int count = pb->count(pb->context);
+
+    if (count < 0)
         return -1;
 
     FILE *file = fopen(path, "wb");
 
-    if (!file)
+    if (file == NULL)
         return -1;
 
-    int ok = fwrite(&pb->count, sizeof(pb->count), 1, file) == 1 &&
-             fwrite(pb->items, sizeof(Contact), pb->count, file) == (size_t)pb->count;
+    int result = fwrite(&count, sizeof(count), 1, file) == 1 ? 0 : -1;
+
+    for (int i = 0; result == 0 && i < count; ++i)
+    {
+        Contact contact;
+
+        if (pb->get(pb->context, i, &contact) != 0 ||
+            fwrite(&contact, sizeof(contact), 1, file) != 1)
+            result = -1;
+    }
 
     if (fclose(file) != 0)
-        ok = 0;
+        result = -1;
 
-    return ok ? 0 : -1;
+    return result;
 }
