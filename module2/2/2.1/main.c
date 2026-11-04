@@ -1,12 +1,12 @@
 #include "phonebook.h"
 #include "storage.h"
-#include "ui.h"
+#include "ui/ui.h"
 
 #include <stdio.h>
 
 int main()
 {
-    Phonebook contacts = {0};
+    PhonebookArray contacts = {0};
     PhonebookAPI api;
 
     if (pb_bind(&api, &contacts) != 0)

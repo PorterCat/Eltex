@@ -10,13 +10,11 @@ typedef struct
 {
     Contact items[MAX_CONTACTS];
     int count;
-} Phonebook;
+} PhonebookArray;
 
-int pb_add(Phonebook *pb, const Contact *contact);
-int pb_remove(Phonebook *pb, int index);
-int pb_get(const Phonebook *pb, int index, Contact *contact);
-int pb_update(Phonebook *pb, int index, const Contact *cont);
+int pb_add(PhonebookArray *pb, const Contact *contact);
+int pb_remove(PhonebookArray *pb, int index);
 
-int pb_bind(PhonebookAPI *api, Phonebook *pb);
+int pb_bind(PhonebookAPI *api, PhonebookArray *pb);
 
 #endif

@@ -3,7 +3,7 @@
 
 #include "phonebook_api.h"
 
-int storage_load(const PhonebookAPI *pb, const char *path);
+int storage_load(PhonebookAPI *pb, const char *path);
 int storage_save(const PhonebookAPI *pb, const char *path);
 
-#endif // STORAGE_H
+#endif
