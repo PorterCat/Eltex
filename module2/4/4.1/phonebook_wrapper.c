@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+typedef int (*CompareFunc)(const void *left, const void *right);
+
 int compare_contacts(const void *left, const void *right)
 {
     const Contact *a = left;
@@ -15,29 +17,128 @@ int compare_contacts(const void *left, const void *right)
     return strcmp(a->first_name, b->first_name);
 }
 
+ListNode *find_position(const LinkedList *list, const Contact *contact, const ListNode *skip,
+                        CompareFunc compare)
+{
+    ListNode *node = list->head;
+
+    while (node != NULL)
+    {
+        if (node != skip && compare(contact, node->data) < 0)
+            return node;
+
+        node = node->next;
+    }
+
+    return NULL;
+}
+
 int api_count(const void *context)
 {
-    return list_count(context);
+    const LinkedList *list = context;
+
+    return list != NULL ? list->count : -1;
 }
 
-int api_get(const void *context, int index, Contact *contact)
+PhonebookIterator api_begin(const void *context)
 {
-    return list_get(context, index, contact);
+    const LinkedList *list = context;
+
+    return list != NULL ? list->head : NULL;
 }
 
-int api_add(void *context, const Contact *contact)
+PhonebookIterator api_next(const void *context, PhonebookIterator iterator)
 {
-    return list_insert_sorted(context, contact, compare_contacts);
+    (void)context;
+
+    const ListNode *node = iterator;
+
+    return node != NULL ? node->next : NULL;
 }
 
-int api_remove(void *context, int index)
+PhonebookIterator api_prev(const void *context, PhonebookIterator iterator)
 {
-    return list_remove(context, index);
+    (void)context;
+
+    const ListNode *node = iterator;
+
+    return node != NULL ? node->prev : NULL;
 }
 
-int api_update(void *context, int index, const Contact *contact)
+Contact *api_get(void *context, PhonebookIterator iterator)
 {
-    return list_update_sorted(context, index, contact, compare_contacts);
+    (void)context;
+
+    ListNode *node = (ListNode *)iterator;
+
+    return node != NULL ? node->data : NULL;
+}
+
+int api_add(void *context, const Contact *contact, PhonebookIterator *inserted)
+{
+    LinkedList *list = context;
+
+    if (inserted != NULL)
+        *inserted = NULL;
+
+    if (list == NULL || contact == NULL)
+        return -1;
+
+    ListNode *position = find_position(list, contact, NULL, compare_contacts);
+    ListNode *node = list_insert(list, position, contact);
+
+    if (node == NULL)
+        return -1;
+
+    if (inserted != NULL)
+        *inserted = node;
+
+    return 0;
+}
+
+int api_remove(void *context, PhonebookIterator iterator, PhonebookIterator *next)
+{
+    LinkedList *list = context;
+    ListNode *node = (ListNode *)iterator;
+
+    if (next != NULL)
+        *next = NULL;
+
+    if (list == NULL || node == NULL)
+        return -1;
+
+    ListNode *position = node->next != NULL ? node->next : node->prev;
+
+    if (list_remove(list, node) != 0)
+        return -1;
+
+    if (next != NULL)
+        *next = position;
+
+    return 0;
+}
+
+int api_update(void *context, PhonebookIterator iterator, PhonebookIterator *updated)
+{
+    LinkedList *list = context;
+    ListNode *node = (ListNode *)iterator;
+
+    if (updated != NULL)
+        *updated = NULL;
+
+    if (list == NULL || node == NULL)
+        return -1;
+
+    Contact *contact = node->data;
+    ListNode *position = find_position(list, contact, node, compare_contacts);
+
+    if (list_move_before(list, node, position) != 0)
+        return -1;
+
+    if (updated != NULL)
+        *updated = node;
+
+    return 0;
 }
 
 void api_clear(void *context)
@@ -47,11 +148,14 @@ void api_clear(void *context)
 
 int pb_bind(PhonebookAPI *api, LinkedList *list)
 {
-    if (api == NULL || list == NULL)
+    if (api == NULL || list == NULL || list->data_size != sizeof(Contact))
         return -1;
 
     *api = (PhonebookAPI){.context = list,
                           .count = api_count,
+                          .begin = api_begin,
+                          .next = api_next,
+                          .prev = api_prev,
                           .get = api_get,
                           .add = api_add,
                           .remove = api_remove,

@@ -1,36 +1,37 @@
 CC = gcc
-CFLAGS = -std=c17 -Wall -Wextra -Wpedantic -O2 -I../../2/2.1
+CFLAGS = -std=c17 -Wall -Wextra -Wpedantic -O2
+CPPFLAGS = -I.
 LDLIBS = -lncursesw
-
-vpath %.c ../../2/2.1
 
 BIN_DIR = bin
 OBJ_DIR = obj
+UI_DIR = ../../2/2.1/ui
 
 TARGET = $(BIN_DIR)/phonebook
 
 SRCS = main.c linked_list.c phonebook_wrapper.c \
        ../../2/2.1/contact.c \
        ../../2/2.1/storage.c \
-       ../../2/2.1/ui.c
+       $(wildcard $(UI_DIR)/*.c)
 
 DEPS = linked_list.h phonebook_wrapper.h \
        ../../2/2.1/contact.h \
        ../../2/2.1/phonebook_api.h \
        ../../2/2.1/storage.h \
-       ../../2/2.1/ui.h
+       $(wildcard $(UI_DIR)/*.h)
 
-OBJS = $(addprefix $(OBJ_DIR)/,$(notdir $(SRCS:.c=.o)))
+OBJS = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRCS))
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS) | $(BIN_DIR)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
 
-$(OBJ_DIR)/%.o: %.c $(DEPS) | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJ_DIR)/%.o: %.c $(DEPS)
+	mkdir -p $(dir $@)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-$(BIN_DIR) $(OBJ_DIR):
+$(BIN_DIR):
 	mkdir -p $@
 
 clean:

@@ -1,6 +1,6 @@
 #include "phonebook_wrapper.h"
 #include "../../2/2.1/storage.h"
-#include "../../2/2.1/ui.h"
+#include "../../2/2.1/ui/ui.h"
 
 #include <stdio.h>
 
