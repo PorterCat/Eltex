@@ -3,14 +3,11 @@
 #include <stddef.h>
 #include <stdio.h>
 
-static int add_contact_message(LinkedList *queue, unsigned int priority,
+static int add_contact_message(LinkedList *queue, uint8_t priority,
                                const Contact *contact, const char *message)
 {
-    if (priority > PRIORITY_MAX)
-        return -1;
-
     ContactMessagePriority item = {0};
-    item.priority = (uint8_t)priority;
+    item.priority = priority;
     item.contact = contact;
     snprintf(item.message, sizeof(item.message), "%s", message);
     return pq_push(queue, &item);
